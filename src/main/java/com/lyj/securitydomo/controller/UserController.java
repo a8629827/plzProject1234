@@ -1,6 +1,7 @@
 package com.lyj.securitydomo.controller;
 
 import com.lyj.securitydomo.config.auth.PrincipalDetails;
+import com.lyj.securitydomo.domain.Post;
 import com.lyj.securitydomo.domain.User;
 import com.lyj.securitydomo.dto.*;
 import com.lyj.securitydomo.repository.UserRepository;
@@ -9,7 +10,9 @@ import com.lyj.securitydomo.service.RequestService;
 import com.lyj.securitydomo.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -195,5 +198,16 @@ public class UserController {
             List<RequestDTO> requests = requestService.getRequestsByUserId(userId);
             model.addAttribute("requests", requests);
         return "/user/myapp";
+    }
+
+    @GetMapping("/user/mywriting")
+    public String myWriting(@RequestParam(required = false) String userId, Model model) {
+        if (userId != null) {
+            model.addAttribute("userId", userId);
+        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserId = authentication.getName(); // 현재 사용자 아이디 가져오기
+        model.addAttribute("currentUserId", currentUserId);
+        return "mywriting"; // 해당 뷰의 이름
     }
 }
